@@ -1,28 +1,6 @@
----
-title: 'Task Tracker'
-description: 'Build a CLI app to track your tasks and manage your to-do list.'
-isNew: false
-sort: 1
-difficulty: 'beginner'
-nature: 'CLI'
-skills:
-  - 'Programming Language'
-  - 'CLI'
-  - 'Filesystem'
-seo:
-  title: 'Task Tracker CLI'
-  description: 'Build a command line interface (CLI) to track your tasks and manage your to-do list.'
-  keywords:
-    - 'task tracker cli'
-    - 'backend project idea'
-roadmapIds:
-  - 'backend'
-  - 'nodejs'
-  - 'python'
-  - 'java'
-  - 'golang'
-  - 'spring-boot'
----
+# Task Tracker
+
+Sample solution for the [task-tracker](https://roadmap.sh/projects/task-tracker) challenge from [roadmap.sh](https://roadmap.sh/).
 
 Task tracker is a project used to track and manage your tasks. In this task, you will build a simple command line interface (CLI) to track what you need to do, what you have done, and what you are currently working on. This project will help you practice your programming skills, including working with the filesystem, handling user inputs, and building a simple CLI application.
 
