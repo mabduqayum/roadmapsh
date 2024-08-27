@@ -18,7 +18,7 @@ The application should run from the command line, accept user actions and inputs
 Here are some constraints to guide the implementation:
 
 - You can use any programming language to build this project.
-- Use positional arguments in command line to accept user inputs.
+- Use positional arguments in the command line to accept user inputs.
 - Use a JSON file to store the tasks in the current directory.
 - The JSON file should be created if it does not exist.
 - Use the native file system module of your programming language to interact with the JSON file.
@@ -82,7 +82,7 @@ Here are a few steps to help you get started with the Task Tracker CLI project:
 ### Implementing Features
 
 - Start by creating a basic CLI structure to handle user inputs.
-- Implement each feature one by one, ensuring to test thoroughly before moving to the next e.g. implement adding task functionality first, listing next, then updating, marking as in progress, etc.
+- Implement each feature one by one, ensuring to test thoroughly before moving to the next e.g., implement adding task functionality first, listing next, then updating, marking as in progress, etc.
 
 ### Testing and Debugging
 
