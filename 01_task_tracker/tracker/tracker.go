@@ -13,7 +13,7 @@ type TaskTracker struct {
 
 func NewTaskTracker() *TaskTracker {
 	return &TaskTracker{
-		Storage: storage.NewFileStorage(".task-tracker", "tasks.json"),
+		Storage: storage.NewFileStorage(".db", "tasks.json"),
 	}
 }
 

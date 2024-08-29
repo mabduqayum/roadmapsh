@@ -27,7 +27,7 @@ func Execute() error {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.task-tracker.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.db.yaml)")
 
 	taskTracker = tracker.NewTaskTracker()
 }
@@ -41,7 +41,7 @@ func initConfig() {
 
 		viper.AddConfigPath(home)
 		viper.SetConfigType("yaml")
-		viper.SetConfigName(".task-tracker")
+		viper.SetConfigName(".db")
 	}
 
 	viper.AutomaticEnv()

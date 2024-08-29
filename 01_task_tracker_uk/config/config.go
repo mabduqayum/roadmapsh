@@ -18,7 +18,7 @@ func Load() (*Config, error) {
 	// Load default configuration
 	if err := k.Load(file.Provider("config.yaml"), yaml.Parser()); err != nil {
 		// If config file doesn't exist, use default values
-		k.Set("tracker_dir", ".task-tracker")
+		k.Set("tracker_dir", ".db")
 		k.Set("tasks_file", "tasks.json")
 	}
 
