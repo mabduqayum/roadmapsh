@@ -2,6 +2,7 @@ package commands
 
 import (
 	"github.com/mabduqayum/roadmapsh/03_expense_tracker/internal/app"
+	"github.com/mabduqayum/roadmapsh/03_expense_tracker/internal/expense"
 	"github.com/urfave/cli/v2"
 )
 
@@ -9,47 +10,75 @@ func GetCommands(expenseApp *app.App) []*cli.Command {
 	return []*cli.Command{
 		{
 			Name:  "add",
-			Usage: "Add a new expense",
-			Flags: []cli.Flag{
-				&cli.StringFlag{Name: "description", Aliases: []string{"d"}, Required: true},
-				&cli.Float64Flag{Name: "amount", Aliases: []string{"a"}, Required: true},
-			},
-			Action: func(c *cli.Context) error {
-				return expenseApp.AddExpense(c.String("description"), c.Float64("amount"))
+			Usage: "Add a new transaction",
+			Subcommands: []*cli.Command{
+				{
+					Name:  "expense",
+					Usage: "Add a new expense",
+					Flags: []cli.Flag{
+						&cli.StringFlag{Name: "description", Aliases: []string{"d"}, Required: true},
+						&cli.Float64Flag{Name: "amount", Aliases: []string{"a"}, Required: true},
+					},
+					Action: func(c *cli.Context) error {
+						return expenseApp.AddTransaction(c.String("description"), c.Float64("amount"), expense.TypeExpense)
+					},
+				},
+				{
+					Name:  "top-up",
+					Usage: "Add a new top-up",
+					Flags: []cli.Flag{
+						&cli.StringFlag{Name: "description", Aliases: []string{"d"}, Required: true},
+						&cli.Float64Flag{Name: "amount", Aliases: []string{"a"}, Required: true},
+					},
+					Action: func(c *cli.Context) error {
+						return expenseApp.AddTransaction(c.String("description"), c.Float64("amount"), expense.TypeTopUp)
+					},
+				},
+				{
+					Name:  "transfer",
+					Usage: "Add a new transfer",
+					Flags: []cli.Flag{
+						&cli.StringFlag{Name: "description", Aliases: []string{"d"}, Required: true},
+						&cli.Float64Flag{Name: "amount", Aliases: []string{"a"}, Required: true},
+					},
+					Action: func(c *cli.Context) error {
+						return expenseApp.AddTransaction(c.String("description"), c.Float64("amount"), expense.TypeTransfer)
+					},
+				},
 			},
 		},
 		{
 			Name:  "update",
-			Usage: "Update an existing expense",
+			Usage: "Update an existing transaction",
 			Flags: []cli.Flag{
 				&cli.IntFlag{Name: "id", Required: true},
 				&cli.StringFlag{Name: "description", Aliases: []string{"d"}, Required: true},
 				&cli.Float64Flag{Name: "amount", Aliases: []string{"a"}, Required: true},
 			},
 			Action: func(c *cli.Context) error {
-				return expenseApp.UpdateExpense(c.Int("id"), c.String("description"), c.Float64("amount"))
+				return expenseApp.UpdateTransaction(c.Int("id"), c.String("description"), c.Float64("amount"))
 			},
 		},
 		{
 			Name:  "delete",
-			Usage: "Delete an expense",
+			Usage: "Delete a transaction",
 			Flags: []cli.Flag{
 				&cli.IntFlag{Name: "id", Required: true},
 			},
 			Action: func(c *cli.Context) error {
-				return expenseApp.DeleteExpense(c.Int("id"))
+				return expenseApp.DeleteTransaction(c.Int("id"))
 			},
 		},
 		{
 			Name:  "list",
-			Usage: "List all expenses",
+			Usage: "List all transactions",
 			Action: func(c *cli.Context) error {
-				return expenseApp.ListExpenses()
+				return expenseApp.ListTransactions()
 			},
 		},
 		{
 			Name:  "summary",
-			Usage: "Show expense summary",
+			Usage: "Show transaction summary",
 			Flags: []cli.Flag{
 				&cli.IntFlag{Name: "month", Aliases: []string{"m"}},
 			},

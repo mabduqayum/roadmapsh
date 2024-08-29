@@ -22,28 +22,28 @@ func NewStorage(file string) *Storage {
 	return &Storage{file: file}
 }
 
-func (s *Storage) Load() ([]expense.Expense, error) {
+func (s *Storage) Load() ([]expense.Transaction, error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
 	data, err := os.ReadFile(s.file)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return []expense.Expense{}, nil
+			return []expense.Transaction{}, nil
 		}
 		return nil, err
 	}
 
-	var expenses []expense.Expense
-	err = json.Unmarshal(data, &expenses)
-	return expenses, err
+	var transactions []expense.Transaction
+	err = json.Unmarshal(data, &transactions)
+	return transactions, err
 }
 
-func (s *Storage) Save(expenses []expense.Expense) error {
+func (s *Storage) Save(transactions []expense.Transaction) error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
-	data, err := json.MarshalIndent(expenses, "", "  ")
+	data, err := json.MarshalIndent(transactions, "", "  ")
 	if err != nil {
 		return err
 	}

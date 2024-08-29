@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/mabduqayum/roadmapsh/03_expense_tracker/internal/expense"
 	"github.com/mabduqayum/roadmapsh/03_expense_tracker/internal/storage"
 )
@@ -19,120 +20,154 @@ func NewApp(storageFile string) *App {
 	}
 }
 
-func (a *App) AddExpense(description string, amount float64) error {
-	expenses, err := a.storage.Load()
+func (a *App) AddTransaction(description string, amount float64, transactionType expense.TransactionType) error {
+	transactions, err := a.storage.Load()
 	if err != nil {
 		return err
 	}
 
 	newID := 1
-	if len(expenses) > 0 {
-		newID = expenses[len(expenses)-1].ID + 1
+	if len(transactions) > 0 {
+		newID = transactions[len(transactions)-1].ID + 1
 	}
 
-	newExpense := expense.Expense{
+	newTransaction := expense.Transaction{
 		ID:          newID,
 		Date:        time.Now(),
 		Description: description,
 		Amount:      amount,
+		Type:        transactionType,
 	}
 
-	expenses = append(expenses, newExpense)
-	err = a.storage.Save(expenses)
+	transactions = append(transactions, newTransaction)
+	err = a.storage.Save(transactions)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("Expense added successfully (ID: %d)\n", newID)
+	fmt.Printf("%s added successfully (ID: %d)\n", transactionType, newID)
 	return nil
 }
 
-func (a *App) UpdateExpense(id int, description string, amount float64) error {
-	expenses, err := a.storage.Load()
+func (a *App) UpdateTransaction(id int, description string, amount float64) error {
+	transactions, err := a.storage.Load()
 	if err != nil {
 		return err
 	}
 
-	for i, e := range expenses {
-		if e.ID == id {
-			expenses[i].Description = description
-			expenses[i].Amount = amount
-			err = a.storage.Save(expenses)
+	for i, t := range transactions {
+		if t.ID == id {
+			transactions[i].Description = description
+			transactions[i].Amount = amount
+			err = a.storage.Save(transactions)
 			if err != nil {
 				return err
 			}
-			fmt.Printf("Expense updated successfully (ID: %d)\n", id)
+			fmt.Printf("Transaction updated successfully (ID: %d)\n", id)
 			return nil
 		}
 	}
 
-	return errors.New("expense not found")
+	return errors.New("transaction not found")
 }
 
-func (a *App) DeleteExpense(id int) error {
-	expenses, err := a.storage.Load()
+func (a *App) DeleteTransaction(id int) error {
+	transactions, err := a.storage.Load()
 	if err != nil {
 		return err
 	}
 
-	for i, e := range expenses {
-		if e.ID == id {
-			expenses = append(expenses[:i], expenses[i+1:]...)
-			err = a.storage.Save(expenses)
+	for i, t := range transactions {
+		if t.ID == id {
+			transactions = append(transactions[:i], transactions[i+1:]...)
+			err = a.storage.Save(transactions)
 			if err != nil {
 				return err
 			}
-			fmt.Printf("Expense deleted successfully (ID: %d)\n", id)
+			fmt.Printf("Transaction deleted successfully (ID: %d)\n", id)
 			return nil
 		}
 	}
 
-	return errors.New("expense not found")
+	return errors.New("transaction not found")
 }
 
-func (a *App) ListExpenses() error {
-	expenses, err := a.storage.Load()
+func (a *App) ListTransactions() error {
+	transactions, err := a.storage.Load()
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("ID  Date       Description  Amount")
-	for _, e := range expenses {
-		fmt.Printf("%d   %s  %-12s $%.2f\n", e.ID, e.Date.Format("2006-01-02"), e.Description, e.Amount)
+	fmt.Println("ID  Date       Type          Description  Amount")
+	for _, t := range transactions {
+		amount := fmt.Sprintf("$%.2f", t.Amount)
+		switch t.Type {
+		case expense.TypeExpense:
+			color.Red("%d   %s  %-8s  %-12s %s\n", t.ID, t.Date.Format("2006-01-02"), t.Type, t.Description, amount)
+		case expense.TypeTopUp:
+			color.Green("%d   %s  %-8s  %-12s %s\n", t.ID, t.Date.Format("2006-01-02"), t.Type, t.Description, amount)
+		case expense.TypeTransfer:
+			color.Yellow("%d   %s  %-8s  %-12s %s\n", t.ID, t.Date.Format("2006-01-02"), t.Type, t.Description, amount)
+		}
 	}
 
 	return nil
 }
 
 func (a *App) Summary() error {
-	expenses, err := a.storage.Load()
+	transactions, err := a.storage.Load()
 	if err != nil {
 		return err
 	}
 
-	total := 0.0
-	for _, e := range expenses {
-		total += e.Amount
+	var totalExpense, totalTopUp, totalTransfer float64
+	for _, t := range transactions {
+		switch t.Type {
+		case expense.TypeExpense:
+			totalExpense += t.Amount
+		case expense.TypeTopUp:
+			totalTopUp += t.Amount
+		case expense.TypeTransfer:
+			totalTransfer += t.Amount
+		}
 	}
 
-	fmt.Printf("Total expenses: $%.2f\n", total)
+	balance := totalTopUp - totalExpense - totalTransfer
+
+	color.Red("Total expenses: $%.2f\n", totalExpense)
+	color.Green("Total top-ups: $%.2f\n", totalTopUp)
+	color.Yellow("Total transfers: $%.2f\n", totalTransfer)
+	fmt.Printf("Current balance: $%.2f\n", balance)
 	return nil
 }
 
 func (a *App) MonthlySummary(month int) error {
-	expenses, err := a.storage.Load()
+	transactions, err := a.storage.Load()
 	if err != nil {
 		return err
 	}
 
-	total := 0.0
+	var totalExpense, totalTopUp, totalTransfer float64
 	currentYear := time.Now().Year()
-	for _, e := range expenses {
-		if e.Date.Month() == time.Month(month) && e.Date.Year() == currentYear {
-			total += e.Amount
+	for _, t := range transactions {
+		if t.Date.Month() == time.Month(month) && t.Date.Year() == currentYear {
+			switch t.Type {
+			case expense.TypeExpense:
+				totalExpense += t.Amount
+			case expense.TypeTopUp:
+				totalTopUp += t.Amount
+			case expense.TypeTransfer:
+				totalTransfer += t.Amount
+			}
 		}
 	}
 
-	fmt.Printf("Total expenses for %s: $%.2f\n", time.Month(month), total)
+	balance := totalTopUp - totalExpense - totalTransfer
+
+	fmt.Printf("Summary for %s:\n", time.Month(month))
+	color.Red("Total expenses: $%.2f\n", totalExpense)
+	color.Green("Total top-ups: $%.2f\n", totalTopUp)
+	color.Yellow("Total transfers: $%.2f\n", totalTransfer)
+	fmt.Printf("Balance: $%.2f\n", balance)
 	return nil
 }
