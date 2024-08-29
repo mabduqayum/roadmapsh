@@ -8,59 +8,71 @@ import (
 )
 
 type TaskTracker struct {
-	Storage storage.TaskStorage
+	Storage *storage.Storage
 }
 
-func NewTaskTracker() *TaskTracker {
+func NewTaskTracker(file string) *TaskTracker {
 	return &TaskTracker{
-		Storage: storage.NewFileStorage(".db", "tasks.json"),
+		Storage: storage.NewStorage(file),
 	}
 }
 
 func (t *TaskTracker) AddTask(description string) (int, error) {
-	tasks := t.Storage.LoadTasks()
+	tasks, err := t.Storage.Load()
+	if err != nil {
+		return 0, err
+	}
 	newTaskId := t.LastId() + 1
 	newTask := models.NewTask(description, newTaskId)
 	tasks.Tasks = append(tasks.Tasks, newTask)
-	err := t.Storage.SaveTasks(tasks)
+	err = t.Storage.Save(tasks)
 	return newTask.ID, err
 }
 
 func (t *TaskTracker) UpdateTask(id int, description string) error {
-	tasks := t.Storage.LoadTasks()
+	tasks, err := t.Storage.Load()
+	if err != nil {
+		return err
+	}
 	for i, task := range tasks.Tasks {
 		if task.ID == id {
 			tasks.Tasks[i].UpdateDescription(description)
-			return t.Storage.SaveTasks(tasks)
+			return t.Storage.Save(tasks)
 		}
 	}
 	return fmt.Errorf("task not found")
 }
 
 func (t *TaskTracker) DeleteTask(id int) error {
-	tasks := t.Storage.LoadTasks()
+	tasks, err := t.Storage.Load()
+	if err != nil {
+		return err
+	}
 	for i, task := range tasks.Tasks {
 		if task.ID == id {
 			tasks.Tasks = append(tasks.Tasks[:i], tasks.Tasks[i+1:]...)
-			return t.Storage.SaveTasks(tasks)
+			return t.Storage.Save(tasks)
 		}
 	}
 	return fmt.Errorf("task not found")
 }
 
 func (t *TaskTracker) MarkTaskStatus(id int, status string) error {
-	tasks := t.Storage.LoadTasks()
+	tasks, err := t.Storage.Load()
+	if err != nil {
+		return err
+	}
 	for i, task := range tasks.Tasks {
 		if task.ID == id {
 			tasks.Tasks[i].UpdateStatus(status)
-			return t.Storage.SaveTasks(tasks)
+			return t.Storage.Save(tasks)
 		}
 	}
 	return fmt.Errorf("task not found")
 }
 
 func (t *TaskTracker) ListTasks(status string) []models.Task {
-	tasks := t.Storage.LoadTasks()
+	tasks, _ := t.Storage.Load()
 	if status == "" {
 		return tasks.Tasks
 	}
@@ -74,7 +86,7 @@ func (t *TaskTracker) ListTasks(status string) []models.Task {
 }
 
 func (t *TaskTracker) LastId() int {
-	tasks := t.Storage.LoadTasks()
+	tasks, _ := t.Storage.Load()
 	if len(tasks.Tasks) == 0 {
 		return 0
 	}

@@ -8,43 +8,41 @@ import (
 	"github.com/mabduqayum/roadmapsh/01_task_tracker_vc/models"
 )
 
-type TaskStorage interface {
-	LoadTasks() models.TaskList
-	SaveTasks(tasks models.TaskList) error
+//type TaskStorage interface {
+//	LoadTasks() models.TaskList
+//	SaveTasks(tasks models.TaskList) error
+//}
+
+type Storage struct {
+	file string
 }
 
-type FileStorage struct {
-	trackerDir string
-	tasksFile  string
-}
-
-func NewFileStorage(trackerDir string, taskFile string) *FileStorage {
-	os.MkdirAll(trackerDir, os.ModePerm)
-	return &FileStorage{
-		trackerDir: trackerDir,
-		tasksFile:  taskFile,
+func NewStorage(file string) *Storage {
+	dir := filepath.Dir(file)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		panic(err)
 	}
+	return &Storage{file: file}
 }
 
-func (fs *FileStorage) LoadTasks() models.TaskList {
-	var taskList models.TaskList
-	data, err := os.ReadFile(filepath.Join(fs.trackerDir, fs.tasksFile))
+func (s *Storage) Load() (*models.TaskList, error) {
+	data, err := os.ReadFile(s.file)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return taskList
+			return &models.TaskList{}, nil
 		}
-		panic(err)
+		return nil, err
 	}
-	if err := json.Unmarshal(data, &taskList); err != nil {
-		panic(err)
-	}
-	return taskList
+
+	var taskList *models.TaskList
+	err = json.Unmarshal(data, &taskList)
+	return taskList, err
 }
 
-func (fs *FileStorage) SaveTasks(taskList models.TaskList) error {
+func (s *Storage) Save(taskList *models.TaskList) error {
 	data, err := json.MarshalIndent(taskList, "", "  ")
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(filepath.Join(fs.trackerDir, fs.tasksFile), data, 0644)
+	return os.WriteFile(s.file, data, 0644)
 }
