@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/mabduqayum/roadmapsh/03_expense_tracker/internal/expense"
+	"github.com/mabduqayum/roadmapsh/03_expense_tracker/internal/transaction"
 )
 
 type Storage struct {
@@ -22,24 +22,24 @@ func NewStorage(file string) *Storage {
 	return &Storage{file: file}
 }
 
-func (s *Storage) Load() ([]expense.Transaction, error) {
+func (s *Storage) Load() ([]transaction.Transaction, error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
 	data, err := os.ReadFile(s.file)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return []expense.Transaction{}, nil
+			return []transaction.Transaction{}, nil
 		}
 		return nil, err
 	}
 
-	var transactions []expense.Transaction
+	var transactions []transaction.Transaction
 	err = json.Unmarshal(data, &transactions)
 	return transactions, err
 }
 
-func (s *Storage) Save(transactions []expense.Transaction) error {
+func (s *Storage) Save(transactions []transaction.Transaction) error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 

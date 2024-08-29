@@ -2,7 +2,7 @@ package commands
 
 import (
 	"github.com/mabduqayum/roadmapsh/03_expense_tracker/internal/app"
-	"github.com/mabduqayum/roadmapsh/03_expense_tracker/internal/expense"
+	"github.com/mabduqayum/roadmapsh/03_expense_tracker/internal/transaction"
 	"github.com/urfave/cli/v2"
 )
 
@@ -20,7 +20,7 @@ func GetCommands(expenseApp *app.App) []*cli.Command {
 						&cli.Float64Flag{Name: "amount", Aliases: []string{"a"}, Required: true},
 					},
 					Action: func(c *cli.Context) error {
-						return expenseApp.AddTransaction(c.String("description"), c.Float64("amount"), expense.TypeExpense)
+						return expenseApp.AddTransaction(c.String("description"), c.Float64("amount"), transaction.TypeExpense)
 					},
 				},
 				{
@@ -31,7 +31,7 @@ func GetCommands(expenseApp *app.App) []*cli.Command {
 						&cli.Float64Flag{Name: "amount", Aliases: []string{"a"}, Required: true},
 					},
 					Action: func(c *cli.Context) error {
-						return expenseApp.AddTransaction(c.String("description"), c.Float64("amount"), expense.TypeTopUp)
+						return expenseApp.AddTransaction(c.String("description"), c.Float64("amount"), transaction.TypeTopUp)
 					},
 				},
 				{
@@ -42,7 +42,7 @@ func GetCommands(expenseApp *app.App) []*cli.Command {
 						&cli.Float64Flag{Name: "amount", Aliases: []string{"a"}, Required: true},
 					},
 					Action: func(c *cli.Context) error {
-						return expenseApp.AddTransaction(c.String("description"), c.Float64("amount"), expense.TypeTransfer)
+						return expenseApp.AddTransaction(c.String("description"), c.Float64("amount"), transaction.TypeTransfer)
 					},
 				},
 			},

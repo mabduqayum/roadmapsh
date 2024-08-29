@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/fatih/color"
-	"github.com/mabduqayum/roadmapsh/03_expense_tracker/internal/expense"
 	"github.com/mabduqayum/roadmapsh/03_expense_tracker/internal/storage"
+	"github.com/mabduqayum/roadmapsh/03_expense_tracker/internal/transaction"
 )
 
 type App struct {
@@ -20,7 +20,7 @@ func NewApp(storageFile string) *App {
 	}
 }
 
-func (a *App) AddTransaction(description string, amount float64, transactionType expense.TransactionType) error {
+func (a *App) AddTransaction(description string, amount float64, transactionType transaction.TransactionType) error {
 	transactions, err := a.storage.Load()
 	if err != nil {
 		return err
@@ -31,7 +31,7 @@ func (a *App) AddTransaction(description string, amount float64, transactionType
 		newID = transactions[len(transactions)-1].ID + 1
 	}
 
-	newTransaction := expense.Transaction{
+	newTransaction := transaction.Transaction{
 		ID:          newID,
 		Date:        time.Now(),
 		Description: description,
@@ -102,11 +102,11 @@ func (a *App) ListTransactions() error {
 	for _, t := range transactions {
 		amount := fmt.Sprintf("$%.2f", t.Amount)
 		switch t.Type {
-		case expense.TypeExpense:
+		case transaction.TypeExpense:
 			color.Red("%d   %s  %-8s  %-12s %s\n", t.ID, t.Date.Format("2006-01-02"), t.Type, t.Description, amount)
-		case expense.TypeTopUp:
+		case transaction.TypeTopUp:
 			color.Green("%d   %s  %-8s  %-12s %s\n", t.ID, t.Date.Format("2006-01-02"), t.Type, t.Description, amount)
-		case expense.TypeTransfer:
+		case transaction.TypeTransfer:
 			color.Yellow("%d   %s  %-8s  %-12s %s\n", t.ID, t.Date.Format("2006-01-02"), t.Type, t.Description, amount)
 		}
 	}
@@ -123,11 +123,11 @@ func (a *App) Summary() error {
 	var totalExpense, totalTopUp, totalTransfer float64
 	for _, t := range transactions {
 		switch t.Type {
-		case expense.TypeExpense:
+		case transaction.TypeExpense:
 			totalExpense += t.Amount
-		case expense.TypeTopUp:
+		case transaction.TypeTopUp:
 			totalTopUp += t.Amount
-		case expense.TypeTransfer:
+		case transaction.TypeTransfer:
 			totalTransfer += t.Amount
 		}
 	}
@@ -152,11 +152,11 @@ func (a *App) MonthlySummary(month int) error {
 	for _, t := range transactions {
 		if t.Date.Month() == time.Month(month) && t.Date.Year() == currentYear {
 			switch t.Type {
-			case expense.TypeExpense:
+			case transaction.TypeExpense:
 				totalExpense += t.Amount
-			case expense.TypeTopUp:
+			case transaction.TypeTopUp:
 				totalTopUp += t.Amount
-			case expense.TypeTransfer:
+			case transaction.TypeTransfer:
 				totalTransfer += t.Amount
 			}
 		}
