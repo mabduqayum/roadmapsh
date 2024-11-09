@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{.Type}} Converter</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>{{.Type}} Converter</h1>
+        <form method="POST">
+            <div class="form-group">
+                <label for="value">Enter value:</label>
+                <input type="number" step="any" name="value" id="value" value="{{.Data.Value}}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="fromUnit">From:</label>
+                <select name="fromUnit" id="fromUnit">
+                    {{range .Units}}
+                    <option value="{{.}}" {{if eq . $.Data.FromUnit}}selected{{end}}>{{.}}</option>
+                    {{end}}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="toUnit">To:</label>
+                <select name="toUnit" id="toUnit">
+                    {{range .Units}}
+                    <option value="{{.}}" {{if eq . $.Data.ToUnit}}selected{{end}}>{{.}}</option>
+                    {{end}}
+                </select>
+            </div>
+            
+            <button type="submit" class="button">Convert</button>
+        </form>
+        
+        {{if .Data.ShowResult}}
+            <div class="result">
+                {{if .Data.Error}}
+                    <p class="error">{{.Data.Error}}</p>
+                {{else}}
+                    <p>Result: {{.Data.Value}} {{.Data.FromUnit}} = {{printf "%.4f" .Data.Result}} {{.Data.ToUnit}}</p>
+                {{end}}
+            </div>
+        {{end}}
+        
+        <a href="/" class="button">Back to Home</a>
+    </div>
+</body>
+</html>

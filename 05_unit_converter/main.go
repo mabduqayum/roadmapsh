@@ -8,121 +8,174 @@ import (
 	"strconv"
 )
 
-type Conversion struct {
-	Value  float64
-	From   string
-	To     string
-	Result float64
-	Type   string
+type ConversionData struct {
+	Value      float64
+	FromUnit   string
+	ToUnit     string
+	Result     float64
+	Error      string
+	ShowResult bool
 }
 
-// Conversion factors for length (to meters)
-var lengthFactors = map[string]float64{
-	// standard
-	"millimeter": 0.001,
-	"centimeter": 0.01,
-	"meter":      1.0,
-	"kilometer":  1000.0,
+type ConversionMap map[string]float64
 
-	// empirical
-	"inch": 0.0254,
-	"foot": 0.3048,
-	"yard": 0.9144,
-	"mile": 1609.34,
-}
-
-// Conversion factors for weight (to kilograms)
-var weightFactors = map[string]float64{
-	// standard
-	"milligram": 0.000001,
-	"gram":      0.001,
-	"kilogram":  1.0,
-
-	// empirical
-	"ounce": 0.0283495,
-	"pound": 0.453592,
-}
-
-func convertLength(value float64, from, to string) float64 {
-	meters := value * lengthFactors[from]
-	return meters / lengthFactors[to]
-}
-
-func convertWeight(value float64, from, to string) float64 {
-	kilograms := value * weightFactors[from]
-	return kilograms / weightFactors[to]
-}
-
-func convertTemperature(value float64, from, to string) float64 {
-	// Convert to Kelvin first
-	var kelvin float64
-	switch from {
-	case "celsius":
-		kelvin = value + 273.15
-	case "fahrenheit":
-		kelvin = (value + 459.67) * 5 / 9
-	case "kelvin":
-		kelvin = value
+var (
+	lengthConversions = ConversionMap{
+		"millimeter": 0.001,
+		"centimeter": 0.01,
+		"meter":      1,
+		"kilometer":  1000,
+		"inch":       0.0254,
+		"foot":       0.3048,
+		"yard":       0.9144,
+		"mile":       1609.344,
 	}
 
-	// Convert from Kelvin to target unit
+	weightConversions = ConversionMap{
+		"milligram": 0.001,
+		"gram":      1,
+		"kilogram":  1000,
+		"ounce":     28.349523125,
+		"pound":     453.59237,
+	}
+
+	temperatureUnits = []string{"celsius", "fahrenheit", "kelvin"}
+)
+
+type Converter interface {
+	Convert(value float64, from, to string) float64
+}
+
+type LengthConverter struct {
+	conversions ConversionMap
+}
+
+type WeightConverter struct {
+	conversions ConversionMap
+}
+
+type TemperatureConverter struct{}
+
+func (lc LengthConverter) Convert(value float64, from, to string) float64 {
+	baseValue := value * lc.conversions[from]
+	return baseValue / lc.conversions[to]
+}
+
+func (wc WeightConverter) Convert(value float64, from, to string) float64 {
+	baseValue := value * wc.conversions[from]
+	return baseValue / wc.conversions[to]
+}
+
+func (tc TemperatureConverter) Convert(value float64, from, to string) float64 {
+	celsiusTemp := value
+	switch from {
+	case "fahrenheit":
+		celsiusTemp = (value - 32) * 5 / 9
+	case "kelvin":
+		celsiusTemp = value - 273.15
+	}
+
 	switch to {
 	case "celsius":
-		return kelvin - 273.15
+		return celsiusTemp
 	case "fahrenheit":
-		return kelvin*9/5 - 459.67
+		return (celsiusTemp * 9 / 5) + 32
 	case "kelvin":
-		return kelvin
+		return celsiusTemp + 273.15
 	}
 	return 0
 }
 
-func handleConversion(w http.ResponseWriter, r *http.Request) {
-	convType := r.URL.Path[1:] // Get conversion type from URL
-	if convType == "" {
-		convType = "length"
-	}
+type Server struct {
+	converters map[string]Converter
+	templates  *template.Template
+}
 
-	tmpl, err := template.ParseFiles("templates/layout.html")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+func NewServer() *Server {
+	return &Server{
+		converters: map[string]Converter{
+			"length":      LengthConverter{conversions: lengthConversions},
+			"weight":      WeightConverter{conversions: weightConversions},
+			"temperature": TemperatureConverter{},
+		},
+		templates: template.Must(template.ParseFiles("templates/index.html", "templates/converter.html")),
 	}
+}
 
-	conv := Conversion{Type: convType}
+func (s *Server) handleConversion(w http.ResponseWriter, r *http.Request, convType string) {
+	data := ConversionData{ShowResult: false}
 
 	if r.Method == http.MethodPost {
 		value, err := strconv.ParseFloat(r.FormValue("value"), 64)
-		if err == nil {
-			conv.Value = value
-			conv.From = r.FormValue("from")
-			conv.To = r.FormValue("to")
+		if err != nil {
+			data.Error = "Invalid number entered"
+			data.ShowResult = true
+		} else {
+			data.Value = value
+			data.FromUnit = r.FormValue("fromUnit")
+			data.ToUnit = r.FormValue("toUnit")
 
-			switch convType {
-			case "length":
-				conv.Result = convertLength(value, conv.From, conv.To)
-			case "weight":
-				conv.Result = convertWeight(value, conv.From, conv.To)
-			case "temperature":
-				conv.Result = convertTemperature(value, conv.From, conv.To)
+			converter, ok := s.converters[convType]
+			if !ok {
+				http.Error(w, "Invalid conversion type", http.StatusBadRequest)
+				return
 			}
+
+			data.Result = converter.Convert(value, data.FromUnit, data.ToUnit)
+			data.ShowResult = true
 		}
 	}
 
-	_ = tmpl.Execute(w, conv)
+	err := s.templates.ExecuteTemplate(w, "converter.html", struct {
+		Type  string
+		Data  ConversionData
+		Units interface{}
+	}{
+		Type:  convType,
+		Data:  data,
+		Units: getUnits(convType),
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func getUnits(convType string) []string {
+	switch convType {
+	case "length":
+		return []string{"millimeter", "centimeter", "meter", "kilometer", "inch", "foot", "yard", "mile"}
+	case "weight":
+		return []string{"milligram", "gram", "kilogram", "ounce", "pound"}
+	case "temperature":
+		return temperatureUnits
+	}
+	return []string{}
 }
 
 func main() {
+	server := NewServer()
+
 	// Serve static files
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	// Handle routes
-	http.HandleFunc("/", handleConversion)
-	http.HandleFunc("/length", handleConversion)
-	http.HandleFunc("/weight", handleConversion)
-	http.HandleFunc("/temperature", handleConversion)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		server.templates.ExecuteTemplate(w, "index.html", nil)
+	})
 
-	fmt.Println("Server starting on :8080...")
+	// Create a single handler for all conversion types
+	conversionHandler := func(convType string) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			server.handleConversion(w, r, convType)
+		}
+	}
+
+	// Register routes using the conversionHandler
+	http.HandleFunc("/length", conversionHandler("length"))
+	http.HandleFunc("/weight", conversionHandler("weight"))
+	http.HandleFunc("/temperature", conversionHandler("temperature"))
+
+	fmt.Println("Server is running on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
