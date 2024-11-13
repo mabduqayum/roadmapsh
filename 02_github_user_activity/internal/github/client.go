@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/mabduqayum/roadmapsh/02_github_user_activity/config"
+	"github_user_activity/config"
 )
 
 type Client struct {

@@ -98,7 +98,7 @@ func NewServer() *Server {
 			"weight":      WeightConverter{conversions: weightConversions},
 			"temperature": TemperatureConverter{},
 		},
-		templates: template.Must(template.ParseFiles("templates/index.html", "templates/converter.html")),
+		templates: template.Must(template.ParseFiles("./templates/index.html", "./templates/converter.html")),
 	}
 }
 

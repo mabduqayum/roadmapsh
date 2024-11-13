@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/mabduqayum/roadmapsh/02_github_user_activity/config"
-	"github.com/mabduqayum/roadmapsh/02_github_user_activity/internal/cli"
+	"github_user_activity/config"
+	"github_user_activity/internal/cli"
 )
 
 func main() {

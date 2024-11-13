@@ -3,8 +3,9 @@ package cli
 import (
 	"fmt"
 
-	"github.com/mabduqayum/roadmapsh/02_github_user_activity/config"
-	"github.com/mabduqayum/roadmapsh/02_github_user_activity/internal/github"
+	"github_user_activity/config"
+	"github_user_activity/internal/github"
+
 	"github.com/urfave/cli/v2"
 )
 
