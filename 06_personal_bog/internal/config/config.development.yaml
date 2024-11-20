@@ -1,0 +1,16 @@
+server:
+  port: 8081
+  host: "localhost"
+  version: "1.0.0"
+
+database:
+  host: "localhost"
+  port: 5432
+  dbname: "postgres"
+  user: "user"
+  password: "password"
+  SSLMode: "disable"
+  schema: "public"
+
+logging:
+  level: "debug"
