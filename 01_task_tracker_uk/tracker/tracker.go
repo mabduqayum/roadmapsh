@@ -2,10 +2,9 @@ package tracker
 
 import (
 	"fmt"
-
-	"github.com/mabduqayum/roadmapsh/01_task_tracker_uk/config"
-	"github.com/mabduqayum/roadmapsh/01_task_tracker_uk/models"
-	"github.com/mabduqayum/roadmapsh/01_task_tracker_uk/storage"
+	"task_tracker_uk/config"
+	"task_tracker_uk/models"
+	"task_tracker_uk/storage"
 )
 
 type TaskTracker struct {
@@ -14,7 +13,7 @@ type TaskTracker struct {
 
 func NewTaskTracker(cfg *config.Config) *TaskTracker {
 	return &TaskTracker{
-		Storage: storage.NewFileStorage(cfg.TrackerDir, cfg.TasksFile),
+		Storage: storage.NewFileStorage(cfg.Storage.TrackerDir, cfg.Storage.TasksFile),
 	}
 }
 

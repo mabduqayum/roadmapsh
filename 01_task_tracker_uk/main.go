@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"task_tracker_uk/commands"
+	"task_tracker_uk/config"
+	"task_tracker_uk/tracker"
 
-	"github.com/mabduqayum/roadmapsh/01_task_tracker_uk/commands"
-	"github.com/mabduqayum/roadmapsh/01_task_tracker_uk/config"
-	"github.com/mabduqayum/roadmapsh/01_task_tracker_uk/tracker"
 	"github.com/urfave/cli/v2"
 )
 

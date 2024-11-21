@@ -3,8 +3,8 @@ package commands
 import (
 	"fmt"
 	"strings"
+	"task_tracker_uk/tracker"
 
-	"github.com/mabduqayum/roadmapsh/01_task_tracker_uk/tracker"
 	"github.com/urfave/cli/v2"
 )
 

@@ -1,0 +1,3 @@
+storage:
+  tracker_dir: ".db"
+  tasks_file: "tasks.json"

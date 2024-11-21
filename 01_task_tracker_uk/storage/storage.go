@@ -4,8 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
-
-	"github.com/mabduqayum/roadmapsh/01_task_tracker_uk/models"
+	"task_tracker_uk/models"
 )
 
 type TaskStorage interface {
