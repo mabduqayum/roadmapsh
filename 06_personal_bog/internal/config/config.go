@@ -50,7 +50,6 @@ func (d DatabaseConfig) ConnectionString() string {
 }
 
 func LoadConfig(env string) (*Config, error) {
-	// todo: use koanf instead
 	viper.SetConfigName(fmt.Sprintf("config.%s", env))
 	viper.AddConfigPath("./internal/config")
 	viper.SetConfigType("yaml")
