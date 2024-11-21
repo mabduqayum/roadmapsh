@@ -30,7 +30,7 @@ func (h *ArticleHandler) GetAllArticles(c *fiber.Ctx) error {
 }
 
 func (h *ArticleHandler) GetArticleBySlug(c *fiber.Ctx) error {
-	slug := c.Params("id")
+	slug := c.Params("slug")
 	article, err := h.articleService.GetBySlug(c.Context(), slug)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -72,7 +72,7 @@ func (h *ArticleHandler) CreateArticle(c *fiber.Ctx) error {
 }
 
 func (h *ArticleHandler) UpdateArticle(c *fiber.Ctx) error {
-	slug := c.Params("id")
+	slug := c.Params("slug")
 
 	existingArticle, err := h.articleService.GetBySlug(c.Context(), slug)
 	if err != nil {
@@ -116,7 +116,7 @@ func (h *ArticleHandler) UpdateArticle(c *fiber.Ctx) error {
 
 // DeleteArticle handles DELETE /api/v1/article/:id
 func (h *ArticleHandler) DeleteArticle(c *fiber.Ctx) error {
-	slug := c.Params("id")
+	slug := c.Params("slug")
 
 	if err := h.articleService.Delete(c.Context(), slug); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{

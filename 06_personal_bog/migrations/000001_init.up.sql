@@ -58,8 +58,8 @@ DECLARE
     base_slug TEXT;
     new_slug TEXT;
     slug_exists BOOLEAN;
+    slug_exists BOOLEAN;
     max_base_length CONSTANT INTEGER := 64;
-    counter INTEGER := 1;
 BEGIN
     base_slug := LOWER(title);
     base_slug := REGEXP_REPLACE(base_slug, '[^a-z0-9\s-]', '', 'g');
@@ -70,17 +70,14 @@ BEGIN
     -- Initial slug attempt
     new_slug := base_slug;
 
-    -- Check if slug exists and append counter if it does
-    LOOP
+    -- Check if slug exists and append timestamp if it does
     EXECUTE format('SELECT EXISTS(SELECT 1 FROM %I WHERE %I = $1)', table_name, slug_column)
     INTO slug_exists
     USING new_slug;
 
-        EXIT WHEN NOT slug_exists;
-
-        counter := counter + 1;
-        new_slug := base_slug || '-' || counter::TEXT;
-    END LOOP;
+    IF slug_exists THEN
+        new_slug := base_slug || '-' || EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT::TEXT;
+    END IF;
 
     RETURN new_slug;
 END;

@@ -17,6 +17,7 @@ func NewArticleService(repo repository.ArticleRepository) *ArticleService {
 }
 
 func (s *ArticleService) GetAll(ctx context.Context) ([]models.Article, error) {
+	// todo: add pagination
 	return s.repo.GetAll(ctx)
 }
 

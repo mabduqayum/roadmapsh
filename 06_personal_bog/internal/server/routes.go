@@ -24,8 +24,8 @@ func (s *FiberServer) RegisterFiberRoutes() {
 	articleHandler := handlers.NewArticleHandler(s.articleService)
 
 	article := api.Group("/article")
-	article.Get("/", articleHandler.GetAllArticles)
 	article.Get("/:slug", articleHandler.GetArticleBySlug)
+	article.Get("/", articleHandler.GetAllArticles)
 	//article.Get("/search")
 
 	//article.Post("/")
