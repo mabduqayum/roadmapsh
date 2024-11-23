@@ -41,15 +41,18 @@ func (r *PostgresArticleRepository) Create(ctx context.Context, article *models.
 
 func (r *PostgresArticleRepository) GetBySlug(ctx context.Context, slug string) (*models.Article, error) {
 	query := `
-        SELECT id, author_id, title, content, slug, published_at, created_at, updated_at, status, view_count
-        FROM articles
-        WHERE slug = $1`
+        SELECT a.id, a.author_id, a.title, a.content, a.slug, a.published_at, a.created_at, a.updated_at, a.status, a.view_count,
+               u.id, u.username, u.email, u.full_name, u.created_at, u.updated_at, u.is_admin, u.last_login
+        FROM articles a
+        LEFT JOIN users u ON a.author_id = u.id
+        WHERE a.slug = $1`
 
 	var article models.Article
+	var user models.User
 	err := r.pool.QueryRow(ctx, query, slug).Scan(
 		&article.ID, &article.AuthorId, &article.Title, &article.Content, &article.Slug,
-		&article.PublishedAt, &article.CreatedAt, &article.UpdatedAt,
-		&article.Status, &article.ViewCount,
+		&article.PublishedAt, &article.CreatedAt, &article.UpdatedAt, &article.Status, &article.ViewCount,
+		&user.ID, &user.Username, &user.Email, &user.FullName, &user.CreatedAt, &user.UpdatedAt, &user.IsAdmin, &user.LastLogin,
 	)
 
 	if err != nil {
@@ -59,14 +62,17 @@ func (r *PostgresArticleRepository) GetBySlug(ctx context.Context, slug string) 
 		return nil, err
 	}
 
+	article.Author = &user
 	return &article, nil
 }
 
 func (r *PostgresArticleRepository) GetAll(ctx context.Context) ([]models.Article, error) {
 	query := `
-        SELECT id, author_id, title, content, slug, published_at, created_at, updated_at, status, view_count
-        FROM articles
-        ORDER BY created_at DESC`
+        SELECT a.id, a.author_id, a.title, a.content, a.slug, a.published_at, a.created_at, a.updated_at, a.status, a.view_count,
+               u.id, u.username, u.email, u.full_name, u.created_at, u.updated_at, u.is_admin, u.last_login
+        FROM articles a
+        LEFT JOIN users u ON a.author_id = u.id
+        ORDER BY a.created_at DESC`
 
 	rows, err := r.pool.Query(ctx, query)
 	if err != nil {
@@ -77,14 +83,16 @@ func (r *PostgresArticleRepository) GetAll(ctx context.Context) ([]models.Articl
 	var articles []models.Article
 	for rows.Next() {
 		var article models.Article
+		var user models.User
 		err := rows.Scan(
 			&article.ID, &article.AuthorId, &article.Title, &article.Content, &article.Slug,
-			&article.PublishedAt, &article.CreatedAt, &article.UpdatedAt,
-			&article.Status, &article.ViewCount,
+			&article.PublishedAt, &article.CreatedAt, &article.UpdatedAt, &article.Status, &article.ViewCount,
+			&user.ID, &user.Username, &user.Email, &user.FullName, &user.CreatedAt, &user.UpdatedAt, &user.IsAdmin, &user.LastLogin,
 		)
 		if err != nil {
 			return nil, err
 		}
+		article.Author = &user
 		articles = append(articles, article)
 	}
 
