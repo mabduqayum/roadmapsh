@@ -8,28 +8,36 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/template/html/v2"
 )
 
 type FiberServer struct {
-	app *fiber.App
-	db  database.Service
-	cfg *config.ServerConfig
-
+	app            *fiber.App
+	db             database.Service
+	cfg            *config.ServerConfig
 	articleService *services.ArticleService
 }
 
 func New(cfg *config.ServerConfig, db database.Service) *FiberServer {
+	// Initialize template engine
+	engine := html.New("./views", ".html")
+
+	// Configure Fiber with the template engine
+	app := fiber.New(fiber.Config{
+		ServerHeader:      "personal_blog",
+		AppName:           "personal_blog v" + cfg.Version,
+		Views:             engine,
+		ViewsLayout:       "layouts/base", // This points to views/layouts/base.html
+		PassLocalsToViews: true,
+	})
+
 	articleRepository := repository.NewPostgresArticleRepository(db.GetPool())
 	articleService := services.NewArticleService(articleRepository)
 
 	server := &FiberServer{
-		app: fiber.New(fiber.Config{
-			ServerHeader: "personal_blog",
-			AppName:      "personal_blog v" + cfg.Version,
-		}),
-		db:  db,
-		cfg: cfg,
-
+		app:            app,
+		db:             db,
+		cfg:            cfg,
 		articleService: articleService,
 	}
 

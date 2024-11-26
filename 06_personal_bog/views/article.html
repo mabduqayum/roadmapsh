@@ -1,0 +1,15 @@
+{{ define "content" }}
+<article class="prose prose-lg max-w-none">
+    <h1 class="text-4xl font-bold text-gray-900">{{ .Article.Title }}</h1>
+
+    {{ if .Article.PublishedAt }}
+    <time class="text-sm text-gray-500 block mt-2" datetime="{{ .Article.PublishedAt.Format "2006-01-02" }}">
+        {{ .Article.PublishedAt.Format "January 2, 2006" }}
+    </time>
+    {{ end }}
+
+    <div class="mt-8 text-gray-700">
+        {{ .Article.Content }}
+    </div>
+</article>
+{{ end }}
