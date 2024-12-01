@@ -26,6 +26,7 @@ func (h *ArticleHandler) ListArticles(c *fiber.Ctx) error {
 
 	return c.Render("articles", fiber.Map{
 		"Articles": articles,
+		"User":     c.Locals("user"),
 	})
 }
 
@@ -46,6 +47,7 @@ func (h *ArticleHandler) ViewArticle(c *fiber.Ctx) error {
 
 	return c.Render("article", fiber.Map{
 		"Article": article,
+		"User":    c.Locals("user"),
 	})
 }
 

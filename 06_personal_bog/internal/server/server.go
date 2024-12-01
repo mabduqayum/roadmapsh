@@ -7,6 +7,7 @@ import (
 	"personal_blog/internal/services"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/template/html/v2"
 )
@@ -16,6 +17,7 @@ type FiberServer struct {
 	db             database.Service
 	cfg            *config.ServerConfig
 	articleService *services.ArticleService
+	userService    *services.UserService
 }
 
 func New(cfg *config.ServerConfig, db database.Service) *FiberServer {
@@ -31,14 +33,20 @@ func New(cfg *config.ServerConfig, db database.Service) *FiberServer {
 		PassLocalsToViews: true,
 	})
 
+	app.Use(logger.New())
+
 	articleRepository := repository.NewPostgresArticleRepository(db.GetPool())
 	articleService := services.NewArticleService(articleRepository)
+
+	userRepository := repository.NewPostgresUserRepository(db.GetPool())
+	userService := services.NewUserService(userRepository)
 
 	server := &FiberServer{
 		app:            app,
 		db:             db,
 		cfg:            cfg,
 		articleService: articleService,
+		userService:    userService,
 	}
 
 	// Add recover middleware
