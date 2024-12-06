@@ -4,6 +4,7 @@ import (
 	"personal_blog/internal/jwt"
 	"personal_blog/internal/models"
 	"personal_blog/internal/services"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
@@ -92,6 +93,13 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 }
 
 func (h *AuthHandler) Logout(c *fiber.Ctx) error {
-	c.ClearCookie("jwt")
+	c.Cookie(&fiber.Cookie{
+		Name:     "jwt",
+		Value:    "",
+		Expires:  time.Time{},
+		HTTPOnly: true,
+		SameSite: "Lax",
+		Path:     "/",
+	})
 	return c.Redirect("/")
 }
