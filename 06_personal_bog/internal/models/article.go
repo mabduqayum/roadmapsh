@@ -14,8 +14,8 @@ const (
 )
 
 type Article struct {
-	ID          int           `json:"id"`
-	AuthorId    *int          `json:"author_id"`
+	ID          int64         `json:"id"`
+	AuthorId    int64         `json:"author_id"`
 	Title       string        `json:"title"`
 	Content     string        `json:"content"`
 	Slug        string        `json:"slug"`
@@ -23,6 +23,6 @@ type Article struct {
 	CreatedAt   time.Time     `json:"created_at"`
 	UpdatedAt   time.Time     `json:"updated_at"`
 	Status      ArticleStatus `json:"status"`
-	ViewCount   int           `json:"view_count"`
+	ViewCount   int64         `json:"view_count"`
 	Author      *User         `json:"author"`
 }

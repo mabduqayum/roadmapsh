@@ -7,8 +7,8 @@ import (
 
 func (s *FiberServer) RegisterFiberRoutes() {
 	s.app.Use(middleware.UserContext(s.userService))
-	s.app.Get("/", handlers.NewArticleHandler(s.articleService).ListArticles)
-	s.app.Get("/article/:slug", handlers.NewArticleHandler(s.articleService).ViewArticle)
+	s.app.Get("/", handlers.NewArticleHandler(s.articleService).ArticlesPage)
+	s.app.Get("/article/:slug", handlers.NewArticleHandler(s.articleService).ArticlePage)
 
 	// Auth routes
 	auth := s.app.Group("/auth")
@@ -19,16 +19,14 @@ func (s *FiberServer) RegisterFiberRoutes() {
 	auth.Post("/register", authHandler.Register)
 	auth.Post("/logout", authHandler.Logout)
 
-	//Protected routes
-	//protected := s.app.Group("/", middleware.AuthMiddleware(s.userService))
-
-	// Apply AuthMiddleware to the home page (optional, depending on your requirements)
-	//protected.Get("/", handlers.NewArticleHandler(s.articleService).ListArticles)
-
-	// API routes (protected)
-	//api := protected.Group("/api")
-	//articleHandler := handlers.NewArticleHandler(s.articleService)
-	//api.Post("/article", articleHandler.CreateArticle)
-	//api.Put("/article/:slug", articleHandler.UpdateArticle)
-	//api.Delete("/article/:slug", articleHandler.DeleteArticle)
+	// Admin routes
+	admin := s.app.Group("/admin")
+	admin.Use(middleware.AuthMiddleware(s.userService))
+	adminHandler := handlers.NewAdminHandler(s.articleService)
+	admin.Get("/", adminHandler.DashboardPage)
+	admin.Get("/articles/new", adminHandler.NewArticlePage)
+	admin.Post("/articles", adminHandler.CreateArticle)
+	admin.Get("/articles/:id/edit", adminHandler.EditArticlePage)
+	admin.Post("/articles/:id", adminHandler.UpdateArticle)
+	admin.Post("/articles/:id/delete", adminHandler.DeleteArticle)
 }

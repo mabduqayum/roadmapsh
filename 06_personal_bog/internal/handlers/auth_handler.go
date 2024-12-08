@@ -56,7 +56,7 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 		HTTPOnly: true,
 	})
 
-	return c.Redirect("/")
+	return c.Redirect("/admin")
 }
 
 func (h *AuthHandler) RegisterPage(c *fiber.Ctx) error {
@@ -89,7 +89,20 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.Redirect("/auth/login")
+	token, err := jwt.GenerateToken(user.ID)
+	if err != nil {
+		return c.Render("register", fiber.Map{
+			"Error": "Failed to generate token",
+		})
+	}
+
+	c.Cookie(&fiber.Cookie{
+		Name:     "jwt",
+		Value:    token,
+		HTTPOnly: true,
+	})
+
+	return c.Redirect("/admin")
 }
 
 func (h *AuthHandler) Logout(c *fiber.Ctx) error {

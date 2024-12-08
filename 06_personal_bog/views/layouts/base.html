@@ -20,7 +20,9 @@
             </div>
             <div class="hidden sm:ml-6 sm:flex sm:items-center">
                 {{ if .User }}
-                <span class="text-gray-700 mr-4">Welcome, {{ .User.Username }}</span>
+                <a href="/admin" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded mr-2">
+                    {{ .User.Username }}
+                </a>
                 <form action="/auth/logout" method="POST" class="inline">
                     <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                         Logout

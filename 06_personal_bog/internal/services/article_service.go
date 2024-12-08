@@ -21,6 +21,14 @@ func (s *ArticleService) GetAll(ctx context.Context) ([]models.Article, error) {
 	return s.repo.GetAll(ctx)
 }
 
+func (s *ArticleService) GetAllByAuthorID(ctx context.Context, authorID int64) ([]models.Article, error) {
+	return s.repo.GetAllByAuthorID(ctx, authorID)
+}
+
+func (s *ArticleService) GetByID(ctx context.Context, id int64) (*models.Article, error) {
+	return s.repo.GetByID(ctx, id)
+}
+
 func (s *ArticleService) GetBySlug(ctx context.Context, slug string) (*models.Article, error) {
 	return s.repo.GetBySlug(ctx, slug)
 }
@@ -33,6 +41,6 @@ func (s *ArticleService) Update(ctx context.Context, article *models.Article) er
 	return s.repo.Update(ctx, article)
 }
 
-func (s *ArticleService) Delete(ctx context.Context, slug string) error {
-	return s.repo.Delete(ctx, slug)
+func (s *ArticleService) Delete(ctx context.Context, id int64) error {
+	return s.repo.Delete(ctx, id)
 }

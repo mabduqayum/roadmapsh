@@ -3,21 +3,23 @@
 
     <div class="space-y-4">
         {{ range .Articles }}
-        <article class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-            <h2 class="text-xl font-semibold text-gray-900">
-                <a href="/article/{{ .Slug }}" class="hover:text-blue-600">
+        <a href="/article/{{ .Slug }}"
+           class="block bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow hover:text-blue-600"
+        >
+            <article>
+                <h2 class="text-xl font-semibold text-gray-900">
                     {{ .Title }}
-                </a>
-            </h2>
-            {{ if .PublishedAt }}
-            <time class="text-sm text-gray-500" datetime="{{ .PublishedAt.Format "2006-01-02" }}">
-                {{ .PublishedAt.Format "January 2, 2006" }}
-            </time>
-            {{ end }}
-            <p class="mt-2 text-gray-600 line-clamp-2">
-                {{ .Content }}
-            </p>
-        </article>
+                </h2>
+                {{ if .PublishedAt }}
+                <time class="text-sm text-gray-500" datetime="{{ .PublishedAt.Format "2006-01-02" }}">
+                    {{ .PublishedAt.Format "January 2, 2006" }}
+                </time>
+                {{ end }}
+                <p class="mt-2 text-gray-600 line-clamp-2">
+                    {{ .Content }}
+                </p>
+            </article>
+        </a>
         {{ end }}
     </div>
 </div>
