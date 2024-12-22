@@ -27,5 +27,8 @@
                 Create Article
             </button>
         </div>
+        {{ if .Error }}
+        <p class="mt-2 text-center text-sm text-red-600">{{ .Error }}</p>
+        {{ end }}
     </form>
 </div>
