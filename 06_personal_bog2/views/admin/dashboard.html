@@ -1,0 +1,22 @@
+<!-- views/admin/dashboard.html -->
+<div class="space-y-8">
+    <div class="flex justify-between">
+        <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+        <a href="/admin/articles/new" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            New Article
+        </a>
+    </div>
+    <div class="space-y-4">
+        {{ range .Articles }}
+        <article class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+            <h2 class="text-xl font-semibold text-gray-900">{{ .Title }}</h2>
+            <div class="mt-2 space-x-2">
+                <a href="/admin/articles/{{ .ID }}/edit" class="text-blue-600 hover:text-blue-800">Edit</a>
+                <form action="/admin/articles/{{ .ID }}/delete" method="POST" class="inline">
+                    <button type="submit" class="text-red-600 hover:text-red-800">Delete</button>
+                </form>
+            </div>
+        </article>
+        {{ end }}
+    </div>
+</div>
