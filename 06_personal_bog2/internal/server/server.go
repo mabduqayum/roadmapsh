@@ -24,6 +24,14 @@ func New(cfg *config.ServerConfig, db database.Service) *FiberServer {
 	// Initialize template engine
 	engine := html.New("./views", ".html")
 
+	// Add custom template functions
+	engine.AddFunc("truncate", func(s string, l int) string {
+		if len(s) > l {
+			return s[:l] + "..."
+		}
+		return s
+	})
+
 	// Configure Fiber with the template engine
 	app := fiber.New(fiber.Config{
 		ServerHeader:      "personal_blog",

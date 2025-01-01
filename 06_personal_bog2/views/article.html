@@ -1,13 +1,13 @@
-<article class="prose prose-lg max-w-none">
-    <h1 class="text-4xl font-bold text-gray-900">{{ .Article.Title }}</h1>
-
+<article>
+    <h1 class="mb-3">{{ .Article.Title }}</h1>
     {{ if .Article.PublishedAt }}
-    <time class="text-sm text-gray-500 block mt-2" datetime="{{ .Article.PublishedAt.Format "2006-01-02" }}">
-        {{ .Article.PublishedAt.Format "January 2, 2006" }}
-    </time>
+    <p class="text-muted">
+        <time datetime="{{ .Article.PublishedAt.Format "2006-01-02" }}">
+            {{ .Article.PublishedAt.Format "January 2, 2006" }}
+        </time>
+    </p>
     {{ end }}
-
-    <div class="mt-8 text-gray-700">
+    <div class="mt-4">
         {{ .Article.Content }}
     </div>
 </article>
