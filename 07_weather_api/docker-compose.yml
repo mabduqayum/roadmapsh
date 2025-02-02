@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+#  api:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    container_name: weather-api
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      - PORT=8080
+#      - REDIS_URL=redis://redis:6379/0
+#      # You can override other environment variables here
+#    depends_on:
+#      - redis
+#    networks:
+#      - weather-network
+#    restart: unless-stopped
+#    healthcheck:
+#      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/health"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
+
+  redis:
+    image: redis:7.4.2-alpine
+    container_name: weather-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+#    networks:
+#      - weather-network
+    restart: unless-stopped
+#    healthcheck:
+#      test: ["CMD", "redis-cli", "ping"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
+    command: redis-server --appendonly yes
+
+  # Optional: Redis Commander (Redis UI)
+#  redis-commander:
+#    image: rediscommander/redis-commander:latest
+#    container_name: weather-redis-commander
+#    environment:
+#      - REDIS_HOSTS=local:redis:6379
+#    ports:
+#      - "8081:8081"
+#    networks:
+#      - weather-network
+#    depends_on:
+#      - redis
+#    restart: unless-stopped
+
+#networks:
+#  weather-network:
+#    driver: bridge
+
+volumes:
+  redis-data:
